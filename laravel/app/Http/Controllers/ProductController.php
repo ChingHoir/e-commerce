@@ -21,6 +21,8 @@ class ProductController extends Controller
     // --- Post /api/products
     public function createProduct(Request $request)
     {
+        $this->authorize('create', Product::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -41,6 +43,7 @@ class ProductController extends Controller
     public function getProduct($productId)
     {
         $product = Product::with('category')->findOrFail($productId);
+        $this->authorize('view', $product);
 
         return response()->json([
             'message' => 'Getting product by ID',
@@ -52,6 +55,7 @@ class ProductController extends Controller
     public function updateProduct(Request $request, $productId)
     {
         $product = Product::findOrFail($productId);
+        $this->authorize('update', $product);
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
@@ -73,6 +77,8 @@ class ProductController extends Controller
     public function deleteProduct($productId)
     {
         $product = Product::findOrFail($productId);
+        $this->authorize('delete', $product);
+
         $product->delete();
 
         return response()->json([

@@ -27,6 +27,8 @@ class CategoryController extends Controller
     // --- Post /api/categories
     public function createCategory(Request $request)
     {
+        $this->authorize('create', Category::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name'
         ]);
@@ -43,6 +45,7 @@ class CategoryController extends Controller
     public function getCategory($categoryId)
     {
         $category = Category::findOrFail($categoryId);
+        $this->authorize('view', $category);
 
         return response()->json([
             "message" => "Getting category by ID",
@@ -54,6 +57,7 @@ class CategoryController extends Controller
     public function updateCategory(Request $request, $categoryId)
     {
         $category = Category::findOrFail($categoryId);
+        $this->authorize('update', $category);
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255|unique:categories,name,' . $categoryId
@@ -71,6 +75,8 @@ class CategoryController extends Controller
     public function deleteCategory($categoryId)
     {
         $category = Category::findOrFail($categoryId);
+        $this->authorize('delete', $category);
+
         $category->delete();
 
         return response()->json([
